@@ -1,10 +1,10 @@
 # MDCK-QPI
 
-This contains scripts to analyse Tomocube images. This is not a library but more a bunch of useful scripts that all leverage on the same functions which are located in "src".
-
+This contains scripts use to analyse data for Cell height, area and volume fluctuations in MDCK monolayers.
+N.B. the code relies on a trainer machine learning model that is not in this repository.
 
 ## Source code
-- 'MlModels.py': machine learning model that classifies voxels as cells. Taken from [HTH-TomocubeAnalysis](https://github.uio.no/Hybrid-Technology-Hub/HTH-TomocubeAnalysis).
+- 'MlModels.py': defines machina learning class(?) that classifies voxels as cells. Taken from [HTH-TomocubeAnalysis](https://github.uio.no/Hybrid-Technology-Hub/HTH-TomocubeAnalysis).
 - 'FormatConvensions.py' and 'ImUtils.py': used to imoprt images. Taken from [HTH-TomocubeAnalysis](https://github.uio.no/Hybrid-Technology-Hub/HTH-TomocubeAnalysis).
 - 'Segmentation3D.py': contains all functions needed to compute 2D heights and refractive index from 3D stacks.
 - 'PlottingFunctions.py': contains functions that return figures that illustrate operations.

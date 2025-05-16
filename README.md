@@ -1,7 +1,7 @@
 # MDCK-QPI
 
 This contains scripts use to analyse data for Cell height, area and volume fluctuations in MDCK monolayers.
-N.B. the code relies on a trainer machine learning model that is not in this repository.
+N.B. the code relies on a trained machine learning model that is not in this repository.
 
 ## Source code
 - 'MlModels.py': defines machina learning class(?) that classifies voxels as cells. Taken from [HTH-TomocubeAnalysis](https://github.uio.no/Hybrid-Technology-Hub/HTH-TomocubeAnalysis).

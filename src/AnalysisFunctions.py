@@ -41,6 +41,8 @@ def compute_flatness_cellwise(dataframe, fmin, fmax):
     rel_err = np.zeros(fmax-fmin)
     density = np.zeros(fmax-fmin)
 
+    N_avrg = 0
+
     i = 0
     for frame in range(fmax-fmin):
         mask = dataframe.frame == frame
@@ -51,7 +53,10 @@ def compute_flatness_cellwise(dataframe, fmin, fmax):
         A_cells = np.sum(dataframe[mask].A)
         density[i] = N_cells / A_cells
 
+        N_avrg  += N_cells
         i += 1
+
+    print(N_avrg / i)
 
     return density, mean, rel_err
 

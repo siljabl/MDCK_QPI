@@ -134,36 +134,23 @@ def compute_polarization(reg_props):
     return radius, theta, a_minor / a_major, 1 / a_major
 
 
-def compute_cell_props(label_im, pos, h_im, n_im, vox_to_um):
+def compute_cell_props(label_im, pos, h_im, n_im, type='holo'):
     '''
     Uses mask of labeled areas to compute cell position, area, volume and mass
     '''
     # Set conversion from pixel to um depending on type of data
-    # Tomocube data
-    if len(vox_to_um) == 3:
-        vox_h    = vox_to_um[0]
-        vox_xy   = vox_to_um[1]
-        vox_area = vox_to_um[1]*vox_to_um[2]
-        vox_vol  = vox_to_um[1]*vox_to_um[2]*vox_to_um[0]
-    # Holomonitor data
-    elif len(vox_to_um) == 2:
-        vox_h    = 1
-        vox_xy   = vox_to_um[1]
-        vox_area = vox_to_um[0]*vox_to_um[1]
-        vox_vol  = vox_to_um[0]*vox_to_um[1]
-
     labels = []
+    minor_axis, major_axis = [], []
     h_mean, h_max, n_mean = [], [], []
     area, perimeter, volume = [], [], []
 
-    # get orientation of cells
     reg_prop = measure.regionprops(label_im, n_im)
-    magnitude, angle, xy_aspect_ratio, xz_aspect_ratio = compute_polarization(reg_prop)
 
     i = 0
     for l in range(label_im.max()):
         label = l+1
         mask = (label_im == label)
+
         # skip labels associated with empty areas 
         if np.sum(mask) == 0:
             continue
@@ -173,19 +160,19 @@ def compute_cell_props(label_im, pos, h_im, n_im, vox_to_um):
             x, y = reg_prop[l].centroid_weighted
             pos[l] = int(x), int(y)
 
-
         # specific to Tomocube data
-        if len(vox_to_um) == 3:
+        if type=='tomo':
             n_mean.append(np.sum(mask*n_im) / np.sum(mask))
 
+        area.append(np.sum(mask))
+        h_mean.append(np.sum(mask*h_im) / np.sum(mask))
+        minor_axis.append(reg_prop[l].axis_minor_length)
+        major_axis.append(reg_prop[l].axis_major_length)
 
         labels.append(label)
-        area.append(vox_area * np.sum(mask))
-        perimeter.append(vox_xy * reg_prop[l].perimeter)
-        volume.append(vox_vol * np.sum(mask * h_im))
-        h_mean.append(vox_h * np.sum(mask*h_im) / np.sum(mask))
-        h_max.append(vox_h * np.max(mask*h_im))
-        xz_aspect_ratio[i] *= h_mean[i] / vox_xy
+        h_max.append(np.max(mask*h_im))
+        volume.append(np.sum(mask * h_im))
+        perimeter.append(reg_prop[l].perimeter)
 
         i += 1
 
@@ -197,13 +184,11 @@ def compute_cell_props(label_im, pos, h_im, n_im, vox_to_um):
                               'V': volume,
                               'h_avrg': h_mean,
                               'h_max': h_max,
-                              'angle': angle,
-                              'magnitude': magnitude,
-                              'xy_ratio': xy_aspect_ratio,
-                              'xz_ratio': xz_aspect_ratio, 
+                              'a_min': minor_axis,
+                              'a_max': major_axis, 
                               'label': labels})
     # Tomocube data
-    if len(vox_to_um) == 3:
+    if type=='tomo':
         cells_tmp['n_avrg'] = n_mean
     
     return cells_tmp

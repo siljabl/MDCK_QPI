@@ -166,13 +166,13 @@ def compute_cell_props(label_im, pos, h_im, n_im, type='holo'):
 
         area.append(np.sum(mask))
         h_mean.append(np.sum(mask*h_im) / np.sum(mask))
-        minor_axis.append(reg_prop[l].axis_minor_length)
-        major_axis.append(reg_prop[l].axis_major_length)
+        minor_axis.append(reg_prop[i].axis_minor_length)
+        major_axis.append(reg_prop[i].axis_major_length)
 
-        labels.append(label)
+        labels.append(label)    # why not l?
         h_max.append(np.max(mask*h_im))
         volume.append(np.sum(mask * h_im))
-        perimeter.append(reg_prop[l].perimeter)
+        perimeter.append(reg_prop[i].perimeter)
 
         i += 1
 
@@ -192,7 +192,6 @@ def compute_cell_props(label_im, pos, h_im, n_im, type='holo'):
         cells_tmp['n_avrg'] = n_mean
     
     return cells_tmp
-
 
 
 def get_voronoi_ridges(pos):

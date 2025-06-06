@@ -136,20 +136,23 @@ def compute_cell_props(label_im, pos, h_im, n_im, vox_to_um):
     # Tomocube data
     if len(vox_to_um) == 3:
         vox_h    = vox_to_um[0]
+        vox_xy   = vox_to_um[1]
         vox_area = vox_to_um[1]*vox_to_um[2]
         vox_vol  = vox_to_um[1]*vox_to_um[2]*vox_to_um[0]
     # Holomonitor data
     elif len(vox_to_um) == 2:
         vox_h    = 1
+        vox_xy   = vox_to_um[1]
         vox_area = vox_to_um[0]*vox_to_um[1]
         vox_vol  = vox_to_um[0]*vox_to_um[1]
 
     area = []
     mass = []
+    perimeter = []
     volume = []
     labels = []
     h_mean, h_max = [], []
-    n_mean, h_2D  = [], []
+    n_mean  = []
 
     reg_prop = measure.regionprops(label_im, n_im)
     magnitude, angle = compute_polarization(reg_prop)
@@ -167,12 +170,11 @@ def compute_cell_props(label_im, pos, h_im, n_im, vox_to_um):
             pos[l] = int(x), int(y)
 
         labels.append(label)
-        area.append(vox_area* np.sum(mask))
+        area.append(vox_area * np.sum(mask))
+        perimeter.append(vox_xy * reg_prop[l].perimeter)
         volume.append(vox_vol * np.sum(mask * h_im))
         h_mean.append(vox_h * np.sum(mask*h_im) / np.sum(mask))
         h_max.append(vox_h * np.max(mask*h_im))
-        h_2D.append(vox_h * np.sum(mask*h_im*(n_im-n0)/(n_cell-n0)) / np.sum(mask))
-
         # Tomocube data
         if len(vox_to_um) == 3:
             mass.append(vox_vol * np.sum(mask * h_im * n_im))   # replace with n-n0/(n_d-n_0)
@@ -181,6 +183,7 @@ def compute_cell_props(label_im, pos, h_im, n_im, vox_to_um):
     mask = (np.all(pos, axis=1) > 0)
     cells_tmp = pd.DataFrame({'x': pos.T[0][mask],
                               'y': pos.T[1][mask],
+                              'P': perimeter,
                               'A': area, 
                               'V': volume,
                               'h_avrg': h_mean,
@@ -191,7 +194,6 @@ def compute_cell_props(label_im, pos, h_im, n_im, vox_to_um):
     # Tomocube data
     if len(vox_to_um) == 3:
         cells_tmp['m'] = mass
-        cells_tmp['h_2D'] = h_2D
         cells_tmp['n_avrg'] = n_mean
     
     return cells_tmp

@@ -62,3 +62,43 @@ def temporal_correlation(x_cell, y_cell):
         auto_corr[dt] = np.mean((x_cell * np.roll(y_cell, axis=0, shift=-dt))[:-dt])
 
     return auto_corr
+
+
+def spatial_autocorrelation(im):
+    # center input around zero (ensure negative correlation)
+    # var = np.mean(im**2) - np.mean(im)**2
+    # im  = (im - np.mean(im)) / np.sqrt(var)
+
+    # compute FFT of image
+    fft_im  = np.fft.fft2(im, norm="ortho")
+    ifft_im = np.fft.ifft2(np.abs(fft_im)**2, norm="ortho")
+    ifft_im = np.fft.fftshift(ifft_im)
+
+    # normalize output
+    ifft_im_norm = np.real(ifft_im) / np.max(np.real(ifft_im))
+
+    return ifft_im_norm
+
+
+
+def radial_distribution(im, vox_to_um, binsize=5):
+    # raduis matrix
+    Lx = int(len(im)/2)
+    Ly = int(len(im[0])/2)
+    x = np.arange(-Lx,Lx+1,1) * vox_to_um[-2]
+    y = np.arange(-Ly,Ly+1,1) * vox_to_um[-1]
+    xx, yy = np.meshgrid(y, x)
+    r = np.sqrt(xx**2. + yy**2.)
+
+    nbins = int((r.max() / binsize)+1)
+    dist = np.zeros(nbins)
+    mean = np.zeros(nbins)
+    std  = np.zeros(nbins)
+
+    for i in range(nbins):
+        mask = (r >= i*binsize) * (r < (i+1)*binsize)
+        dist[i] = np.mean(r[mask])
+        mean[i] = np.mean(im[mask])
+        std[i]  = np.std(im[mask])
+
+    return dist, mean, std

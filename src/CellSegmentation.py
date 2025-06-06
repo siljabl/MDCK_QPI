@@ -121,17 +121,17 @@ def get_cell_areas(im, pos, h_im, clear_edge=True):
     return cell_areas, cell_edges
 
 
-def compute_polarization(reg_props):
-    '''
-    Computes radius and angle of polarization
-    Also returns planar aspect ratio and 1 / a_major for computation of normal aspect ratio 
-    '''
-    a_major = [reg.axis_major_length for reg in reg_props]
-    a_minor = [reg.axis_minor_length for reg in reg_props]
-    theta  = [reg.orientation for reg in reg_props]
-    radius = [(a_max-a_min) / np.sqrt(a_max**2+a_min**2) for a_max, a_min in zip(a_major, a_minor)]
+# def compute_polarization(reg_props):
+#     '''
+#     Computes radius and angle of polarization
+#     Also returns planar aspect ratio and 1 / a_major for computation of normal aspect ratio 
+#     '''
+#     a_major = [reg.axis_major_length for reg in reg_props]
+#     a_minor = [reg.axis_minor_length for reg in reg_props]
+#     theta  = [reg.orientation for reg in reg_props]
+#     radius = [(a_max-a_min) / np.sqrt(a_max**2+a_min**2) for a_max, a_min in zip(a_major, a_minor)]
 
-    return radius, theta, a_minor / a_major, 1 / a_major
+#     return radius, theta, a_minor / a_major, 1 / a_major
 
 
 def compute_cell_props(label_im, pos, h_im, n_im, type='holo'):

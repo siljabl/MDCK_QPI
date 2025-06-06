@@ -50,7 +50,7 @@ cell_density = np.zeros(fMax)
 for f in range(fMax):
     p = tracks[tracks.frame==f].particle.values
     
-    cell_density[f] = 10 ** 6 * len(p) / np.sum(tracks[tracks.frame==f].A)
+    cell_density[f] = 10 ** 6 * np.sum(tracks[tracks.frame==f]) / np.sum(tracks[tracks.frame==f].A)
 
     # position
     x_arr[f, p] = tracks[tracks.frame==f].x.values
@@ -73,16 +73,20 @@ major_axis  = np.ma.masked_array(a_max, mask = (x_arr < 0) * (y_arr < 0))
 x_displacement = np.ma.diff(x_position, axis=0)
 y_displacement = np.ma.diff(y_position, axis=0)
 
+out_dict = {'cell_density': cell_density,
+             'x_position': x_position, 
+             'y_position': y_position,
+             'x_displacement': x_displacement,
+             'y_displacement': y_displacement,
+             'cell_area': cell_area,
+             'mean_height': mean_height,
+             'minor_axis': minor_axis,
+             'major_axis': major_axis}
+
 # save as pickle
 with open(f"{path}/masked_arrays.pkl", 'wb') as handle:
-    pickle.dump(x_position,     handle, protocol=pickle.HIGHEST_PROTOCOL)
-    pickle.dump(y_position,     handle, protocol=pickle.HIGHEST_PROTOCOL)
-    pickle.dump(x_displacement, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    pickle.dump(x_displacement, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    pickle.dump(cell_area,      handle, protocol=pickle.HIGHEST_PROTOCOL)
-    pickle.dump(mean_height,    handle, protocol=pickle.HIGHEST_PROTOCOL)
-    pickle.dump(minor_axis,     handle, protocol=pickle.HIGHEST_PROTOCOL)
-    pickle.dump(major_axis,     handle, protocol=pickle.HIGHEST_PROTOCOL)
+    pickle.dump(out_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
 
 # plot velocity field
 for f in range(len(x_displacement)):

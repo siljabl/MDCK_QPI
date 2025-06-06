@@ -49,7 +49,7 @@ for i in tqdm(range(len(n_im))):
     pos = update_pos(pos, areas)
 
     # compute cell properties
-    tmp_df = compute_cell_props(areas, pos, h_im[i], n_im[i], vox_to_um)
+    tmp_df = compute_cell_props(areas, pos, h_im[i], n_im[i], type='tomo')
     tmp_df['frame'] = i
 
     # save to df and list

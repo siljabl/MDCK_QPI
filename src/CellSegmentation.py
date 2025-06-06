@@ -9,6 +9,7 @@ from skimage import morphology as morph
 from skimage.segmentation import watershed, clear_border
 
 n0 = 1.33
+nd = 1.4
 n_cell = 1.38
 
 def smoothen_normalize_im(n_im, s_low, s_high, fig=False):
@@ -121,18 +122,23 @@ def get_cell_areas(im, pos, h_im, clear_edge=True):
 
 
 def compute_polarization(reg_props):
+    '''
+    Computes radius and angle of polarization
+    Also returns planar aspect ratio and 1 / a_major for computation of normal aspect ratio 
+    '''
     a_major = [reg.axis_major_length for reg in reg_props]
     a_minor = [reg.axis_minor_length for reg in reg_props]
     theta  = [reg.orientation for reg in reg_props]
     radius = [(a_max-a_min) / np.sqrt(a_max**2+a_min**2) for a_max, a_min in zip(a_major, a_minor)]
 
-    return radius, theta
+    return radius, theta, a_minor / a_major, 1 / a_major
 
 
 def compute_cell_props(label_im, pos, h_im, n_im, vox_to_um):
     '''
     Uses mask of labeled areas to compute cell position, area, volume and mass
     '''
+    # Set conversion from pixel to um depending on type of data
     # Tomocube data
     if len(vox_to_um) == 3:
         vox_h    = vox_to_um[0]
@@ -146,17 +152,15 @@ def compute_cell_props(label_im, pos, h_im, n_im, vox_to_um):
         vox_area = vox_to_um[0]*vox_to_um[1]
         vox_vol  = vox_to_um[0]*vox_to_um[1]
 
-    area = []
-    mass = []
-    perimeter = []
-    volume = []
     labels = []
-    h_mean, h_max = [], []
-    n_mean  = []
+    h_mean, h_max, n_mean = [], [], []
+    area, perimeter, volume = [], [], []
 
+    # get orientation of cells
     reg_prop = measure.regionprops(label_im, n_im)
-    magnitude, angle = compute_polarization(reg_prop)
+    magnitude, angle, xy_aspect_ratio, xz_aspect_ratio = compute_polarization(reg_prop)
 
+    i = 0
     for l in range(label_im.max()):
         label = l+1
         mask = (label_im == label)
@@ -169,16 +173,21 @@ def compute_cell_props(label_im, pos, h_im, n_im, vox_to_um):
             x, y = reg_prop[l].centroid_weighted
             pos[l] = int(x), int(y)
 
+
+        # specific to Tomocube data
+        if len(vox_to_um) == 3:
+            n_mean.append(np.sum(mask*n_im) / np.sum(mask))
+
+
         labels.append(label)
         area.append(vox_area * np.sum(mask))
         perimeter.append(vox_xy * reg_prop[l].perimeter)
         volume.append(vox_vol * np.sum(mask * h_im))
         h_mean.append(vox_h * np.sum(mask*h_im) / np.sum(mask))
         h_max.append(vox_h * np.max(mask*h_im))
-        # Tomocube data
-        if len(vox_to_um) == 3:
-            mass.append(vox_vol * np.sum(mask * h_im * n_im))   # replace with n-n0/(n_d-n_0)
-            n_mean.append(np.sum(mask*n_im) / np.sum(mask))
+        xz_aspect_ratio[i] *= h_mean[i] / vox_xy
+
+        i += 1
 
     mask = (np.all(pos, axis=1) > 0)
     cells_tmp = pd.DataFrame({'x': pos.T[0][mask],
@@ -190,10 +199,11 @@ def compute_cell_props(label_im, pos, h_im, n_im, vox_to_um):
                               'h_max': h_max,
                               'angle': angle,
                               'magnitude': magnitude,
+                              'xy_ratio': xy_aspect_ratio,
+                              'xz_ratio': xz_aspect_ratio, 
                               'label': labels})
     # Tomocube data
     if len(vox_to_um) == 3:
-        cells_tmp['m'] = mass
         cells_tmp['n_avrg'] = n_mean
     
     return cells_tmp

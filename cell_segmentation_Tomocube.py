@@ -25,26 +25,10 @@ args = parser.parse_args()
 vox_to_um = get_voxel_size_35mm()
 n_im, h_im = import_tomocube_stack(args.dir, args.file, h_scaling=vox_to_um[0], f_min=args.fmin, f_max=args.fmax)
 
-
-# h_dir = f"{args.dir}{args.file}/heights"
-# n_dir = f"{args.dir}{args.file}/refractive_index"
-# path = Path(h_dir)
 try:
     os.mkdir(f"{args.dir}/cell_detection")
 except:
     None
-
-# n_data = []
-# h_data = []
-
-# #Import data
-# for f in range(41):
-#     n_data.append(imageio.v2.imread(f"{n_dir}/250210.113448.MDCK dynamics.001.MDCK B.A2.T001P01_HT3D_{f}_mean_refractive.tiff"))
-#     h_data.append(imageio.v2.imread(f"{h_dir}/250210.113448.MDCK dynamics.001.MDCK B.A2.T001P01_HT3D_{f}_heights.tiff"))
-
-# h_im = np.array(h_data, dtype=np.float32)
-# n_im = np.array(n_data, dtype=np.float32)
-# n_im = scale_refractive(n_im)
 
 
 cells_df = pd.DataFrame()

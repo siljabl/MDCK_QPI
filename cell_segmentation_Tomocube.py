@@ -1,4 +1,4 @@
-import imageio
+import os
 import argparse
 import numpy as np
 import pandas as pd
@@ -29,6 +29,10 @@ n_im, h_im = import_tomocube_stack(args.dir, args.file, h_scaling=vox_to_um[0], 
 # h_dir = f"{args.dir}{args.file}/heights"
 # n_dir = f"{args.dir}{args.file}/refractive_index"
 # path = Path(h_dir)
+try:
+    os.mkdir(f"{args.dir}/cell_detection")
+except:
+    None
 
 # n_data = []
 # h_data = []
@@ -81,7 +85,7 @@ for i in tqdm(range(len(n_im))):
     ax[0].set(title="original image")
     ax[1].set(title="image fed to immax")
     fig.tight_layout()
-    plt.savefig(f"{args.dir}/figs/frame_{i+1}_sigma_{args.s_low}_{args.s_high}_H{args.H}.png");
+    plt.savefig(f"{args.dir}/cell_detection/frame_{i+1}_sigma_{args.s_low}-{args.s_high}_H{args.H}.png");
     plt.close()
 
 cells_df.to_csv(f"{args.dir}/area_volume_unfiltered.csv", index=False)

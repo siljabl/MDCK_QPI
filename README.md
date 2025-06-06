@@ -21,7 +21,7 @@ N.B. the code relies on a trained machine learning model that is not in this rep
 - 'cell_segmentation_Holomonitor/Tomocube.py': find cells and cell properties in cell monolayers. Saves output as csv dataframe. Saves imshows in 'cell_detections'
 - 'test_cell_segmentation.ipynb': notebook used to find good segmentation parameters.
 - 'filter_and_track_cells.ipynb': filter out spurious cells based on height, area and volume. Tracks cells using trackpy.
-- 'save_as_pickle.py': 
+- 'save_as_pickle.py': transform dataframe to masked arrays and save in pickle. Plot velocity fields 
 
 ## Analysis
 - 'dataset_properties.ipynb': get dataset properties such as iamge size, cell density, etc.

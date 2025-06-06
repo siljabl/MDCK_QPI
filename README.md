@@ -20,7 +20,8 @@ N.B. the code relies on a trained machine learning model that is not in this rep
 - 'save_2D_folder.py': Turns 3D masks from 'segmentation' into 2D tiffs of heights (um) and refractive indices. Saves tiffs in 'heights' and 'refractive_index'. Refractive index is scales to have 1.38 as mean.
 - 'cell_segmentation_Holomonitor/Tomocube.py': find cells and cell properties in cell monolayers. Saves output as csv dataframe.
 - 'test_cell_segmentation.ipynb': notebook used to find good segmentation parameters.
-- 'filter_cells.ipynb': filter out spurious cells based on height, area and volume.
+- 'filter_and_track_cells.ipynb': filter out spurious cells based on height, area and volume. Tracks cells using trackpy.
+- 'save_as_pickle.py': 
 
 ## Analysis
 - 'dataset_properties.ipynb': get dataset properties such as iamge size, cell density, etc.

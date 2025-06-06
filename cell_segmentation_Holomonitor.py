@@ -28,7 +28,7 @@ args = parser.parse_args()
 h_dir = f"{args.dir}{args.file}"
 path = Path(h_dir)
 try:
-    os.mkdir(f"{h_dir}/figs")
+    os.mkdir(f"{h_dir}/cell_detection")
 except:
     None
 
@@ -72,7 +72,7 @@ for i in tqdm(range(len(h_im))):
     ax[0].set(title="original image")
     ax[1].set(title="image fed to immax")
     fig.tight_layout()
-    plt.savefig(f"{h_dir}/figs/frame_{i+1}_sigma_{args.s_low}_{args.s_high}_H{args.Hmax}.png");
+    plt.savefig(f"{h_dir}/cell_detection/frame_{i+1}_sigma_{args.s_low}_{args.s_high}_H{args.Hmax}.png");
     plt.close()
 
 

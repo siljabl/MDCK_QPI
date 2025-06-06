@@ -210,45 +210,6 @@ def compute_cell_props(label_im, pos, h_im, n_im, vox_to_um):
 
 
 
-
-# def get_cell_areas(im, pos, h_im, w_edge=2, area_threshold=200, clear_edge=True):
-#     '''
-#     Uses watershed to obtain mask of labeled cell areas
-#     area_threshold: in pixels
-#     '''
-#     seeds = generate_seed_mask(pos, im.shape)
-    
-#     # get cell areas with watershed
-#     raw_areas = watershed(im, seeds, watershed_line=True)
-#     if clear_edge:
-#         raw_areas = clear_border(raw_areas)
-#     raw_areas = morph.remove_small_holes((raw_areas>0), area_threshold=10, connectivity=2)
-
-#     # make edges thicker
-#     raw_edges = (raw_areas == 0)
-#     edges = morph.dilation(raw_edges, morph.disk(w_edge))
-#     areas = (edges == 0)
-
-#     # remove empty areas
-#     cell_mask = (h_im > 0)
-#     cell_areas = areas*cell_mask
-#     cell_areas = morph.remove_small_holes(cell_areas, area_threshold=100)
-
-#     # remove small areas not corresponding to cell pos
-#     cell_areas = morph.remove_small_objects(cell_areas, min_size=area_threshold)
-#     cell_areas = measure.label(cell_areas)
-
-#     return cell_areas
-
-
-
-# def add_edges(areas):
-#     new_areas = np.zeros_like(areas)
-#     for l in np.unique(areas):
-#         new_areas += morph.erosion(areas*(areas == l), morph.disk(2))
-#     return new_areas
-
-
 def get_voronoi_ridges(pos):
     '''
     Copied from scipy.spatial.plot_voronoi_2d source code: 
@@ -334,6 +295,5 @@ def compute_volume_change(df):
     df['dV'] /= df['V']
 
     return df
-
 
 

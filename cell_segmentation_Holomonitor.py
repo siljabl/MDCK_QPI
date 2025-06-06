@@ -21,6 +21,7 @@ parser.add_argument("-s_high",  type=int, help="kernel size for high pass Gaussi
 parser.add_argument("-scaling", type=int, help="Holomonitor scaling to µm", default=100)
 parser.add_argument("-fmin",    type=int, help="First useful frame", default=1)
 parser.add_argument("-fmax",    type=int, help="First useful frame", default=181)
+parser.add_argument("-clear_edge", type=bool, help="Should be True if monolayer is larger than FOV, otherwise False")
 args = parser.parse_args()
 
 
@@ -75,7 +76,9 @@ for i in tqdm(range(len(h_im))):
     plt.savefig(f"{h_dir}/cell_detection/frame_{i+1}_sigma_{args.s_low}-{args.s_high}_H{args.Hmax}.png");
     plt.close()
 
-
+# filter out small cells
+cells_df = cells_df[cells_df.A*pix_to_um[0]**2 >= 100]
 cells_df.to_csv(f"{h_dir}/area_volume_unfiltered.csv", index=False)
+
 np.save(f"{h_dir}/cell_areas.npy", im_areas)
 np.save(f"{h_dir}/cell_edges.npy", im_edges)

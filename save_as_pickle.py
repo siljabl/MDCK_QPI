@@ -50,7 +50,7 @@ cell_density = np.zeros(fMax)
 for f in range(fMax):
     p = tracks[tracks.frame==f].particle.values
     
-    cell_density[f] = 10 ** 6 * np.sum(tracks[tracks.frame==f]) / np.sum(tracks[tracks.frame==f].A)
+    cell_density[f] = 10 ** 6 * len(p) / np.sum(tracks[tracks.frame==f].A*pix_to_um[-1]**2)
 
     # position
     x_arr[f, p] = tracks[tracks.frame==f].x.values
@@ -86,7 +86,7 @@ out_dict = {'cell_density': cell_density,
 # save as pickle
 with open(f"{path}/masked_arrays.pkl", 'wb') as handle:
     pickle.dump(out_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
-
+    
 
 # plot velocity field
 for f in range(len(x_displacement)):
@@ -96,7 +96,7 @@ for f in range(len(x_displacement)):
     fig, ax = plt.subplots(1,1, figsize=(10,10))
     ax.set(title=f"{file}, frame: {f+1}, #cells: {cell_density[f]}")
     ax.imshow(stack[f].T, origin="lower")
-    ax.quiver(x_position[f], y_position[f], x_displacement[f], y_displacement[f], scale=75/pix_to_um[0])
+    ax.quiver(x_position[f], y_position[f], x_displacement[f], y_displacement[f], scale=75/pix_to_um[-1])
     
     fig.tight_layout()
     fig.savefig(f"{dir}{file}/instant_velocities/frame_{f+1}.png");

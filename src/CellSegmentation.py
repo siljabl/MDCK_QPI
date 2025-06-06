@@ -157,7 +157,7 @@ def compute_cell_props(label_im, pos, h_im, n_im, type='holo'):
 
         # update position
         if np.all(pos[l]) == 0:
-            x, y = reg_prop[l].centroid_weighted
+            x, y = reg_prop[i].centroid_weighted
             pos[l] = int(x), int(y)
 
         # specific to Tomocube data

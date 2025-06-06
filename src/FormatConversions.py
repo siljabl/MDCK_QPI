@@ -30,7 +30,7 @@ def is_tile(filepath):
 def import_holomonitor_stack(dir, dataset, f_min=1, f_max=180, h_scaling=100):
     # mask that set area outside cells to zero
     try:
-        mask = (imageio.v2.imread(f"{dir}/mask.tiff") > 0)
+        mask = (imageio.v2.imread(f"{dir}{dataset}/mask.tiff") > 0)
     except:
         mask = np.ones_like(imageio.v2.imread(f"{dir}{dataset}/Well {dataset} _reg_Zc_{1}.tiff"))
     

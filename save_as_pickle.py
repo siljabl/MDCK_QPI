@@ -29,7 +29,7 @@ except:
     None
 
 # read data
-print(dir)
+print(path)
 stack     = import_holomonitor_stack(dir, file, f_min=fmin, f_max=fmax)
 tracks    = pd.read_csv(f"{path}/cell_tracks.csv")
 pix_to_um = get_pixel_size()
@@ -95,7 +95,7 @@ for f in range(len(x_displacement)):
     # plot
     fig, ax = plt.subplots(1,1, figsize=(10,10))
     ax.set(title=f"{file}, frame: {f+1}, #cells: {cell_density[f]}")
-    ax.imshow(stack[f].T, origin="lower")
+    ax.imshow(stack[f].T, origin="lower", vmin=0, vmax=20)
     ax.quiver(x_position[f], y_position[f], x_displacement[f], y_displacement[f], scale=75/pix_to_um[-1])
     
     fig.tight_layout()

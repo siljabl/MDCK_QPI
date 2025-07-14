@@ -64,7 +64,7 @@ for i in tqdm(range(len(h_im))):
     # plot
     fig, ax = plt.subplots(1,2, figsize=(20,10))
     fig.suptitle(f"{args.file}, frame: {i+1}, #cells: {len(tmp_df)}")
-    ax[0].imshow(h_im[i].T, origin="lower")
+    ax[0].imshow(h_im[i].T, origin="lower", vmin=0, vmax=20)
     ax[1].imshow(n_norm.T,  origin="lower")
 
     ax[0].plot(tmp_df.x, tmp_df.y, 'r.', ms=5)

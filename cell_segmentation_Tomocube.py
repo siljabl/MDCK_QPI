@@ -14,7 +14,8 @@ from src.CellSegmentation import *
 parser = argparse.ArgumentParser(description="Usage: python cell_segmentation_Tomocube.py dir file")
 parser.add_argument("dir",      type=str,   help="Path to data folder")
 parser.add_argument("file",     type=str,   help="Name of data series")
-parser.add_argument("-H",       type=float, help="value to add to imextendedmin",  default=0.015)
+parser.add_argument("-Hmax",    type=float, help="value to add to imextendedmin",  default=0.015)
+parser.add_argument("-Hmin",    type=float, help="value to add to imextendedmin",  default=0.01)
 parser.add_argument("-s_low",   type=int,   help="kernel size for low pass Gaussian filter",  default=30)
 parser.add_argument("-s_high",  type=int,   help="kernel size for high pass Gaussian filter", default=33)
 parser.add_argument("-fmin",    type=int, help="First useful frame", default=1)
@@ -35,7 +36,7 @@ cells_df = pd.DataFrame()
 im_areas = []
 im_edges = []
 
-H_arr = np.linspace(args.H, args.H-0.005, len(n_im), endpoint=True)
+H_arr = np.linspace(args.Hmax, args.Hmin, len(n_im), endpoint=True)
 
 for i in tqdm(range(len(n_im))):
     # identify cells
@@ -69,7 +70,7 @@ for i in tqdm(range(len(n_im))):
     ax[0].set(title="original image")
     ax[1].set(title="image fed to immax")
     fig.tight_layout()
-    plt.savefig(f"{args.dir}/cell_detection/frame_{i+1}_sigma_{args.s_low}-{args.s_high}_H{args.H}.png");
+    plt.savefig(f"{args.dir}/cell_detection/frame_{i+1}_sigma_{args.s_low}-{args.s_high}_H{args.Hmax}.png");
     plt.close()
 
 cells_df.to_csv(f"{args.dir}/area_volume_unfiltered.csv", index=False)

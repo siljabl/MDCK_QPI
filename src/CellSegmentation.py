@@ -73,7 +73,7 @@ def generate_seed_mask(pos, _shape):
     Turns list of cell positions into matrix with cell labels.
     Used as seeds for watershed.
     '''
-    seeds = np.zeros(_shape)
+    seeds = np.zeros(_shape, dtype=int)
     i = 1
     for x, y in pos:
         seeds[x,y] = i
@@ -103,8 +103,9 @@ def get_cell_areas(im, pos, h_im, clear_edge=True):
 
     # get cell areas with watershed
     seeds = generate_seed_mask(pos, im.shape)
-    areas = watershed(im, seeds, watershed_line=False, connectivity=2)
-    edges = watershed(im, seeds, watershed_line=True,  connectivity=2)
+    areas = watershed(im, seeds, watershed_line=False, connectivity=1)
+    edges = watershed(im, seeds, watershed_line=True,  connectivity=1)
+
 
     # remove empty areas
     cell_mask = (h_im > 0)

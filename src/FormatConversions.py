@@ -59,8 +59,8 @@ def import_tomocube_stack(dir, dataset, h_scaling, f_min=0, f_max=40, n_cell=1.3
     n_stack = []
     h_stack = []
     for f in range(f_min, f_max+1):
-        h_frame = imageio.v2.imread(f"{dir}/heights/{dataset}.T001P01_HT3D_{f}_heights.tiff")
-        n_frame = imageio.v2.imread(f"{dir}/refractive_index/{dataset}.T001P01_HT3D_{f}_mean_refractive.tiff")
+        h_frame = imageio.v2.imread(f"{dir}/heights/{dataset}_HT3D_{f}_heights.tiff")
+        n_frame = imageio.v2.imread(f"{dir}/refractive_index/{dataset}_HT3D_{f}_mean_refractive.tiff")
 
         h_stack.append(h_frame)
         n_stack.append(n_frame)

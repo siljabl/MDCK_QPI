@@ -28,7 +28,7 @@ args = parser.parse_args()
 
 # create folders
 in_dir = f"{args.dir}predictions"
-assert os.path.exists(in_dir)
+assert os.path.exists(in_dir), "In path does not exist, maybe because of missing '/' at the end of path"
 path = Path(in_dir)
 out_dir  = f"{args.dir}segmentation"
 mhds_dir = f"{out_dir}{os.sep}mhds"

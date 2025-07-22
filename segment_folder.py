@@ -103,7 +103,7 @@ with open(logfile, "a") as log:
         # compute zero level. same for entire experiment
         z_0 = estimate_cell_bottom(dri_dz_list)
         fig = plot_z_profile([ri_z_list, dri_dz_list], [prob_z_list, dprob_dz_list], stack, cell_prob, z_0)
-        fig.savefig(f"{mhds_dir}{os.sep}{Path(exp).name}_zero_level.png")
+        fig.savefig(f"{mhds_dir}{os.sep}{Path(exp).name}_zero_level.png", dpi=300)
         print(f"zero-level: {z_0}\n")
 
 
@@ -143,7 +143,7 @@ with open(logfile, "a") as log:
 
         # plot illustration of MlM threshold and final mask
         fig = plot_threshold(thresholds, [sum_above, sum_below], cell_prob.shape, z_0)
-        fig.savefig(f"{mhds_dir}{os.sep}{file.name.split('_prob.npy')[0]}_threshold.png")
+        fig.savefig(f"{mhds_dir}{os.sep}{file.name.split('_prob.npy')[0]}_threshold.png", dpi=300)
 
 
 

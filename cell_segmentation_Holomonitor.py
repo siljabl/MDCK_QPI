@@ -49,21 +49,19 @@ for i in tqdm(range(len(h_im))):
     n_norm = smoothen_normalize_im(h_im[i], args.s_low, args.s_high)
     pos = find_cell_pos(-n_norm, H_arr[i])
 
-
     # segment cell areas using watershed
     areas, edges = get_cell_areas(-n_norm, pos, h_im[i], clear_edge=True)
     pos = update_pos(pos, areas)
-
 
     # compute cell properties
     tmp_df = compute_cell_props(areas, pos, h_im[i], h_im[i], type='holo')
     tmp_df['frame'] = i
 
-
     # save to df and list
     cells_df = pd.concat([cells_df, tmp_df], ignore_index=True)
     im_areas.append(areas)
     im_edges.append(edges)
+
 
     # plot
     fig, ax = plt.subplots(1,2, figsize=(20,10))

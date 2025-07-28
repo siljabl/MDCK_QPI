@@ -3,6 +3,7 @@ Create 3D mask out of 3D probabilities from catBioM_MlM
 '''
 
 import os
+import pickle
 import argparse
 import tifffile
 import numpy as np
@@ -145,5 +146,16 @@ with open(logfile, "a") as log:
         fig = plot_threshold(thresholds, [sum_above, sum_below], cell_prob.shape, z_0)
         fig.savefig(f"{mhds_dir}{os.sep}{file.name.split('_prob.npy')[0]}_threshold.png", dpi=300)
 
+        # save as pickle
+        out_dict = {'ri_z_list':        ri_z_list,
+                    'dri_dz_list':      dri_dz_list,
+                    'thresholds':       thresholds,
+                    'sum_above':        sum_above,
+                    'sum_below':        sum_below,
+                    'cell_prob_shape':  cell_prob.shape}
+        
+        with open(f"{mhds_dir}{os.sep}/lists_for_plotting.pkl", 'wb') as handle:
+            pickle.dump(out_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        
 
 

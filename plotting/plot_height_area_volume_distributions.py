@@ -90,16 +90,17 @@ colors  = cm.roma_r(np.linspace(0, 1, Nbins))
 fig, ax = plt.subplots(2,2, figsize=(8,6))
 
 for i in range(len(binned_height)):
-    h_x, h_y, bins = hist_to_curve(binned_height[i], bins=12)
-    A_x, A_y, bins = hist_to_curve(binned_area[i],   bins=20)
-    V_x, V_y, bins = hist_to_curve(binned_volume[i], bins=40)
-    p_x, p_y, bins = hist_to_curve(binned_shape[i],  bins=20)
+    h_x, h_y, bins = hist_to_curve(binned_height[i], bins=30)
+    A_x, A_y, bins = hist_to_curve(binned_area[i],   bins=40)
+    V_x, V_y, bins = hist_to_curve(binned_volume[i], bins=50)
+    p_x, p_y, bins = hist_to_curve(binned_shape[i],  bins=30)
 
     ax[0,0].plot(h_x, h_y, '-', color=colors[i])
     ax[0,1].plot(A_x, A_y, '-', color=colors[i])
     ax[1,0].plot(V_x, V_y, '-', color=colors[i])
     ax[1,1].plot(p_x, p_y, '-', color=colors[i])
 
+   
 
 ax[0,0].set(xlabel=r"$h ~[µm]$",   ylabel="PDF")
 ax[0,1].set(xlabel=r"$A ~[µm^2]$")

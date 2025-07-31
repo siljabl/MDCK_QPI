@@ -1,11 +1,10 @@
-import os
+import json
 import argparse
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 
-from pathlib import Path
 from tqdm import tqdm
+from pathlib import Path
 
 from src.FormatConversions import import_tomocube_stack
 from src.Segmentation3D import *
@@ -58,22 +57,18 @@ for i in tqdm(range(len(n_im))):
     im_areas.append(areas)
     im_edges.append(edges)
 
-    # plot
-    fig, ax = plt.subplots(1,2, figsize=(20,10))
-    fig.suptitle(f"frame: {i+1}, #cells: {len(tmp_df)}")
-    ax[0].imshow(n_im[i].T, origin="lower", vmin=1.35)
-    ax[1].imshow(n_norm.T,  origin="lower")
-
-    ax[0].plot(tmp_df.x, tmp_df.y, 'r.', ms=5)
-    ax[1].plot(tmp_df.x, tmp_df.y, 'r.', ms=5)
-
-    ax[0].set(title="original image")
-    ax[1].set(title="image fed to immax")
-    fig.tight_layout()
-    plt.savefig(f"{args.dir}/cell_detection/frame_{i+1}_sigma_{args.s_low}-{args.s_high}_H{args.Hmax}.png");
-    plt.close()
 
 cells_df.to_csv(f"{args.dir}/area_volume_unfiltered.csv", index=False)
 np.save(f"{args.dir}/cell_areas.npy", im_areas)
 np.save(f"{args.dir}/cell_edges.npy", im_edges)
 
+
+# save input
+config = {'fmin': args.fmin,
+          'fmax': args.fmax,
+          's_low': args.s_low,
+          's_high': args.s_high,
+          'Hmax': args.Hmax,
+          'Hmin': args.Hmin}
+
+json.dump(config, open(f"{args.dir}{args.file}/config.txt", "w"))

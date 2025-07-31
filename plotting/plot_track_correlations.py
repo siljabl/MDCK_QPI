@@ -63,7 +63,7 @@ frame_to_hour = 1 / args.frames_per_hour
 test, density_bins = bin_by_density(data['C_t'][0], density, bin_size=args.bin_size)
 
 # define colormap
-Nbins  = len(density_bins)
+Nbins  = 13#len(density_bins)
 colors = cm.roma_r(np.linspace(0, 1, Nbins))
 sm     = plt.cm.ScalarMappable(cmap=cm.roma_r, norm=plt.Normalize(vmin=density.min(), vmax=density.max()))
 

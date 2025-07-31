@@ -18,7 +18,7 @@ N.B. the code relies on a trained machine learning model that is not in this rep
 - 'predict_folder_bioMlM.py': Uses model trained by Thomas to predict the probability that a voxel is a cell or not. Runs on entire folder and saves probabilities in 'prediction' folder
 - 'segment_folder.py': Segments cells based on probabilities in 'predictions'. Estimates the zero-level for each petri dish and a frame-specific threshold on cell probabilities and applies median filter. Saves mask and configurations in 'segmentation'.
 - 'save_2D_folder.py': Turns 3D masks from 'segmentation' into 2D tiffs of heights (um) and refractive indices. Saves tiffs in 'heights' and 'refractive_index'. Refractive index is scales to have 1.38 as mean.
-- 'cell_segmentation_Holomonitor/Tomocube.py': find cells and cell properties in cell monolayers. Saves output as csv dataframe. Saves imshows in 'cell_detections'
+- 'cell_segmentation_Holomonitor/Tomocube.py': find cells and cell properties in cell monolayers. Saves output as csv dataframe.
 - 'test_cell_segmentation.ipynb': notebook used to find good segmentation parameters.
 - 'filter_and_track_cells.ipynb': filter out spurious cells based on height, area and volume. Tracks cells using trackpy.
 - 'save_as_pickle.py': transform dataframe to masked arrays and save in pickle. Plot velocity fields 

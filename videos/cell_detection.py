@@ -40,11 +40,15 @@ h_im = import_holomonitor_stack(args.dir, args.file, f_min=config['fmin'], f_max
 A_im = np.load(f"{args.dir}{args.file}/cell_areas.npy")
 df   = pd.read_csv(f"{args.dir}{args.file}/area_volume_unfiltered.csv")
 
+
+
 # conversion factor
 pix_to_um = get_pixel_size()
 
+
+# set value range
 vmin = 0
-vmax = h_im.max()
+vmax = 20 #h_im.max()
 
 # loop through frames
 for frame in tqdm(np.unique(df.frame)):
@@ -74,11 +78,13 @@ for frame in tqdm(np.unique(df.frame)):
     ax.plot(tmp_df.x, tmp_df.y, 'r.', ms=5)
     ax.set(title=f"#cells: {len(tmp_df)}")
 
+
     # add scalebar
     sb = ScaleBar(pix_to_um[-1], 'um', box_alpha=0, color="w", height_fraction=2e-2, scale_loc="none", fixed_value=100)
     sb.location = 'lower left'
     ax.add_artist(sb)
 
+    # save
     fig.tight_layout()
     plt.savefig(f"{args.dir}{args.file}/cell_detection/frame_{frame+1}.png", dpi=300);
     plt.close()

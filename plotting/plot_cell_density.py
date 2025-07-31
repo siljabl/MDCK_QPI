@@ -48,8 +48,7 @@ frame_to_hour = 1 / args.frames_per_hour
 # fit growth curve to cell density
 density   = data['cell_density']
 time      = np.arange(len(data['cell_density'])) / 12
-params, _ = curve_fit(cell_growth, time, density)
-
+params, _ = curve_fit(cell_growth, time, density, p0=[16, density[0]])
 
 
 ############
@@ -59,6 +58,7 @@ fig, ax = plt.subplots(1,1, figsize=(5,3.5))
 
 ax.plot(time, density, '.', ms=4)
 ax.plot(time, cell_growth(time, *params), 'r-', label=rf"$\propto2^{{~t~/~{params[0]:0.0f}}}$")
+
 
 ax.set(xlabel="time [h]",
        ylabel=r"$\rho_{cell} ~[mm^{-2}]$")

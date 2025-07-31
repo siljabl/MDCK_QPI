@@ -111,6 +111,6 @@ for f in tqdm(range(len(x_displacement))):
 
     # save
     fig.tight_layout()
-    fig.savefig(f"{args.dir}{args.file}/instant_velocities/frame_{f+1}.png", dpi=300);
+    fig.savefig(f"{args.dir}{args.file}/instant_velocities/frame_{f+1}_test2.png", dpi=300);
     plt.close()
 

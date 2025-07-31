@@ -90,9 +90,9 @@ colors  = cm.roma_r(np.linspace(0, 1, Nbins))
 fig, ax = plt.subplots(2,2, figsize=(8,6))
 
 for i in range(len(binned_height)):
-    h_x, h_y, bins = hist_to_curve(binned_height[i], bins=30)
-    A_x, A_y, bins = hist_to_curve(binned_area[i],   bins=40)
-    V_x, V_y, bins = hist_to_curve(binned_volume[i], bins=50)
+    h_x, h_y, bins = hist_to_curve(binned_height[i], bins=22)
+    A_x, A_y, bins = hist_to_curve(binned_area[i],   bins=30)
+    V_x, V_y, bins = hist_to_curve(binned_volume[i], bins=40)
     p_x, p_y, bins = hist_to_curve(binned_shape[i],  bins=30)
 
     ax[0,0].plot(h_x, h_y, '-', color=colors[i])

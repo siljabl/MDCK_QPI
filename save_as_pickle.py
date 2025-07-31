@@ -99,6 +99,7 @@ for f in tqdm(range(len(x_displacement))):
     sns.heatmap(stack[f].T, ax=ax, square=True, cmap="gray", vmin=0, vmax=20, 
                 xticklabels=False, yticklabels=False, cbar=True, cbar_kws={'label': 'h [µm]'})
     
+    ax.invert_yaxis()
     ax.quiver(x_position[f], y_position[f], x_displacement[f], y_displacement[f], scale=75/pix_to_um[-1], color="c")
 
 

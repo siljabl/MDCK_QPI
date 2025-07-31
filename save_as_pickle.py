@@ -4,34 +4,36 @@ import pickle
 import argparse
 import numpy as np
 import pandas as pd
+import seaborn as sns
 import matplotlib.pyplot as plt
+
+from tqdm import tqdm
+from matplotlib_scalebar.scalebar import ScaleBar
 
 from src.HolomonitorFunctions import get_pixel_size
 from src.FormatConversions import import_holomonitor_stack
 
 parser = argparse.ArgumentParser(description='Transfer dataframe to pickle of masked arrays')
-parser.add_argument('dataset', type=int, help="data set as listed in holo_dict")
+parser.add_argument("dir",      type=str,  help="Path to data folder")
+parser.add_argument("file",     type=str,  help="Name of data series")
+#parser.add_argument('dataset', type=int, help="data set as listed in config")
 args = parser.parse_args()
 
 
 # folder and path settings
-holo_dict = json.load(open("../data/Holomonitor/settings.txt"))
+config = json.load(open(f"{args.dir}{args.file}/config.txt"))
+fmin = config["fmin"]
+fmax = config["fmax"]
 
-path = "../" + holo_dict["files"][args.dataset].split("../../")[-1]
-fmin = holo_dict["fmin"][args.dataset]
-fmax = holo_dict["fmax"][args.dataset]
-file = path.split("/")[-1]
-dir  = path.split(file)[0]
 
 try:
-    os.mkdir(f"{dir}{file}/instant_velocities")
+    os.mkdir(f"{args.dir}{args.file}/instant_velocities")
 except:
     None
 
 # read data
-print(path)
-stack     = import_holomonitor_stack(dir, file, f_min=fmin, f_max=fmax)
-tracks    = pd.read_csv(f"{path}/cell_tracks.csv")
+stack     = import_holomonitor_stack(args.dir, args.file, f_min=fmin, f_max=fmax)
+tracks    = pd.read_csv(f"{args.dir}{args.file}/cell_tracks.csv")
 pix_to_um = get_pixel_size()
 
 
@@ -84,21 +86,30 @@ out_dict = {'cell_density': cell_density,
              'major_axis': major_axis}
 
 # save as pickle
-with open(f"{path}/masked_arrays.pkl", 'wb') as handle:
+with open(f"{args.dir}{args.file}/masked_arrays.pkl", 'wb') as handle:
     pickle.dump(out_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
     
 
 # plot velocity field
-for f in range(len(x_displacement)):
+for f in tqdm(range(len(x_displacement))):
     Ncells = np.sum(x_position)
 
     # plot
-    fig, ax = plt.subplots(1,1, figsize=(10,10))
-    ax.set(title=f"{file}, frame: {f+1}, #cells: {cell_density[f]}")
-    ax.imshow(stack[f].T, origin="lower", vmin=0, vmax=20)
-    ax.quiver(x_position[f], y_position[f], x_displacement[f], y_displacement[f], scale=75/pix_to_um[-1])
+    fig, ax = plt.subplots(1,1, figsize=(10,8))
+    sns.heatmap(stack[f].T, ax=ax, square=True, cmap="gray", vmin=0, vmax=20, 
+                xticklabels=False, yticklabels=False, cbar=True, cbar_kws={'label': 'h [µm]'})
     
+    ax.quiver(x_position[f], y_position[f], x_displacement[f], y_displacement[f], scale=75/pix_to_um[-1], color="c")
+
+
+    # add scalebar
+    sb = ScaleBar(pix_to_um[-1], 'um', box_alpha=0, color="w", height_fraction=2e-2, scale_loc="none", fixed_value=100)
+    sb.location = 'lower left'
+    ax.add_artist(sb)
+
+
+    # save
     fig.tight_layout()
-    fig.savefig(f"{dir}{file}/instant_velocities/frame_{f+1}.png");
+    fig.savefig(f"{args.dir}{args.file}/instant_velocities/frame_{f+1}.png", dpi=300);
     plt.close()
 

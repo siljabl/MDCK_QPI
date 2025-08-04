@@ -14,26 +14,28 @@ from src.HolomonitorFunctions import get_pixel_size
 from src.FormatConversions import import_holomonitor_stack
 
 parser = argparse.ArgumentParser(description='Transfer dataframe to pickle of masked arrays')
-parser.add_argument("dir",      type=str,  help="Path to data folder")
-parser.add_argument("file",     type=str,  help="Name of data series")
+parser.add_argument('path',          type=str, help="path to datasett")
 #parser.add_argument('dataset', type=int, help="data set as listed in config")
 args = parser.parse_args()
 
 
 # folder and path settings
-config = json.load(open(f"{args.dir}{args.file}/config.txt"))
+file = args.path.split("/")[-2]
+dir  = args.path.split(file)[0]
+
+config = json.load(open(f"{args.path}/config.txt"))
 fmin = config["fmin"]
 fmax = config["fmax"]
 
 
 try:
-    os.mkdir(f"{args.dir}{args.file}/instant_velocities")
+    os.mkdir(f"{args.path}/instant_velocities")
 except:
     None
 
 # read data
-stack     = import_holomonitor_stack(args.dir, args.file, f_min=fmin, f_max=fmax)
-tracks    = pd.read_csv(f"{args.dir}{args.file}/cell_tracks.csv")
+stack     = import_holomonitor_stack(dir, file, f_min=fmin, f_max=fmax)
+tracks    = pd.read_csv(f"{args.path}/cell_tracks.csv")
 pix_to_um = get_pixel_size()
 
 
@@ -86,7 +88,7 @@ out_dict = {'cell_density': cell_density,
              'major_axis': major_axis}
 
 # save as pickle
-with open(f"{args.dir}{args.file}/masked_arrays.pkl", 'wb') as handle:
+with open(f"{args.path}/masked_arrays.pkl", 'wb') as handle:
     pickle.dump(out_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
     
 
@@ -111,6 +113,6 @@ for f in tqdm(range(len(x_displacement))):
 
     # save
     fig.tight_layout()
-    fig.savefig(f"{args.dir}{args.file}/instant_velocities/frame_{f+1}_test2.png", dpi=300);
+    fig.savefig(f"{args.path}/instant_velocities/frame_{f+1:03d}.png", dpi=300);
     plt.close()
 

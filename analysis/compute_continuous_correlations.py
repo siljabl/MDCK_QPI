@@ -158,7 +158,7 @@ for frame in tqdm(range(fmax)):
 
         # save
         fig.tight_layout()
-        fig.savefig(f"{args.in_path}/PIV_velocity_fields/frame_{frame}.png", dpi=300);
+        fig.savefig(f"{args.in_path}/PIV_velocity_fields/frame_{frame:03d}.png", dpi=300);
         plt.close()
 
 

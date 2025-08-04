@@ -13,21 +13,21 @@ from scipy.ndimage         import gaussian_filter
 from src.FormatConversions import import_holomonitor_stack
 
 parser = argparse.ArgumentParser(description='Compute cell properties from segmented data')
-parser.add_argument('dataset',    type=int, help="path to main dir")
+parser.add_argument('path',    type=str, help="path to file")
 args = parser.parse_args()
 
 
 # folder and path settings
-holo_dict = json.load(open("../data/Holomonitor/settings.txt"))
+config = json.load(open(f"{args.path}/config.txt"))
 
-path = "../" + holo_dict["files"][args.dataset].split("../../")[-1]
-fmin = holo_dict["fmin"][args.dataset]
-fmax = holo_dict["fmax"][args.dataset]
-file = path.split("/")[-1]
-dir  = path.split(file)[0]
+fmin = config["fmin"]
+fmax = config["fmax"]
+file = args.path.split("/")[-2]
+dir  = args.path.split(file)[0]
+
 
 try:
-    os.mkdir(f"{path}/PIV")
+    os.mkdir(f"{args.path}/PIV")
 except:
     None
 
@@ -48,7 +48,7 @@ plt.plot(frame, mean_height, 'k', lw=2)
 plt.plot(frame, corrected_mean, 'r--')
 plt.xlabel("Time [h]")
 plt.ylabel("Mean height [µm]")
-plt.savefig(f"{path}/PIV/mean_intensity.png")
+plt.savefig(f"{args.path}/PIV/mean_intensity.png")
 
 
 PIV_stack = stack.data * (corrected_mean / mean_height)[:,np.newaxis, np.newaxis]
@@ -56,4 +56,4 @@ PIV_stack = np.array(PIV_stack.data * (2**8 / np.max(PIV_stack)), dtype=np.uint8
 
 for frame in range(len(PIV_stack.data)):
     im = PIV_stack[frame]
-    imageio.imwrite(f"{path}/PIV/frame_{frame}.tiff", im, dtype=np.uint8)
+    imageio.imwrite(f"{args.path}/PIV/frame_{frame}.tiff", im, dtype=np.uint8)

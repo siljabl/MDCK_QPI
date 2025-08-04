@@ -20,24 +20,26 @@ from src.FormatConversions import import_holomonitor_stack
 from src.HolomonitorFunctions import get_pixel_size
 
 parser = argparse.ArgumentParser(description="Usage: python cell_segmentation_Holomonitor.py dir file")
-parser.add_argument("dir",      type=str,  help="Path to data folder")
-parser.add_argument("file",     type=str,  help="Name of data series")
+parser.add_argument('path',          type=str,   help="path to dataset")
 parser.add_argument("-edges",   type=bool, help="Plot edges", default=False)
 args = parser.parse_args()
 
 
 # create out folder
 try:
-    os.mkdir(f"{args.dir}{args.file}/cell_height_and_volume")
+    os.mkdir(f"{args.path}/cell_height_and_volume")
 except:
     None
 
+file = args.path.split("/")[-2]
+dir  = args.path.split(file)[0]
+
 
 # import data
-config = json.load(open(f"{args.dir}{args.file}/config.txt"))
-h_im = import_holomonitor_stack(args.dir, args.file, f_min=config['fmin'], f_max=config['fmax'])
-A_im = np.load(f"{args.dir}{args.file}/cell_areas.npy")
-df   = pd.read_csv(f"{args.dir}{args.file}/area_volume_unfiltered.csv")
+config = json.load(open(f"{args.path}/config.txt"))
+h_im = import_holomonitor_stack(dir, file, f_min=config['fmin'], f_max=config['fmax'])
+A_im = np.load(f"{args.path}/cell_areas.npy")
+df   = pd.read_csv(f"{args.path}/cell_tracks.csv")
 
 
 
@@ -102,8 +104,8 @@ for frame in tqdm(np.unique(df.frame)):
     sns.heatmap(e_im.T, ax=ax_h, cmap=e_cmap,  xticklabels=False, yticklabels=False, cbar=False)
     sns.heatmap(e_im.T, ax=ax_V, cmap=e_cmap,  xticklabels=False, yticklabels=False, cbar=False)
 
-    ax_h.set(title=f"average cell height [µm]")
-    ax_V.set(title=f"cell volume [µm³]")
+    ax_h.set(title=f"average cell height (µm)")
+    ax_V.set(title=f"cell volume (µm³)")
 
 
     # # add scalebar
@@ -115,8 +117,9 @@ for frame in tqdm(np.unique(df.frame)):
     fig_h.tight_layout()
     fig_V.tight_layout()
 
-    fig_h.savefig(f"{args.dir}{args.file}/cell_height_and_volume/height_frame_{frame+1}.png", dpi=300);
-    fig_V.savefig(f"{args.dir}{args.file}/cell_height_and_volume/volume_frame_{frame+1}.png", dpi=300);
+    fig_h.savefig(f"{args.path}/cell_height_and_volume/height_frame_{frame+1}.png", dpi=300);
+    fig_V.savefig(f"{args.path}/cell_height_and_volume/volume_frame_{frame+1}.png", dpi=300);
 
-    plt.close()
+    plt.close(fig_h)
+    plt.close(fig_V)
 

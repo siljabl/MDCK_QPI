@@ -61,7 +61,7 @@ ax.plot(time, cell_growth(time, *params), 'r-', label=rf"$\propto2^{{~t~/~{param
 
 
 ax.set(xlabel="time [h]",
-       ylabel=r"$\rho_{cell} ~[mm^{-2}]$")
+       ylabel=r"$\rho_{cell} ~(mm^{-2})$")
 ax.legend()
 
 fig.tight_layout()

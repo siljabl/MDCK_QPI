@@ -12,7 +12,11 @@ import json
 import pickle
 import argparse
 import numpy as np
+import seaborn as sns
 import matplotlib.pyplot as plt
+
+from tqdm import tqdm
+from matplotlib_scalebar.scalebar import ScaleBar
 
 module_path = os.path.abspath(os.path.join(''))
 if module_path not in sys.path:
@@ -43,7 +47,7 @@ if args.out_path == None:
 
 # Folder for plotting velocity fields
 try:
-    os.mkdir(f"{args.in_path}/PIV/velocity_fields")
+    os.mkdir(f"{args.in_path}/PIV_velocity_fields")
 except:
     None
 
@@ -52,11 +56,11 @@ except:
 config = json.load(open(f"{args.in_path}/config.txt"))
 
 fmin = config["fmin"]
-fmax = config["fmax"]
+fmax = config["fmax"]-1 #-1 because PIV missing last frame
 if args.fmax != None:
     fmax = args.fmax
 
-file = args.in_path.split("/")[-1]
+file = args.in_path.split("/")[-2]
 dir  = args.in_path.split(file)[0]
 
 
@@ -104,10 +108,10 @@ PIV_velocity_x = np.zeros((fmax, xmax, xmax), dtype=np.float64)
 PIV_velocity_y = np.zeros((fmax, xmax, xmax), dtype=np.float64)
 PIV_height     = np.zeros((fmax, xmax, xmax), dtype=np.float64) # not PIV, but same size as PIV
 
-im_height = stack
+im_height = np.copy(stack)
 
 # Fill arrays
-for frame in range(fmax):
+for frame in tqdm(range(fmax)):
 
     # Load data
     data_PIV = np.loadtxt(f"{args.in_path}/PIV/velocities/PIVlab_{frame+1:04d}.txt", delimiter=",", skiprows=3)
@@ -135,14 +139,26 @@ for frame in range(fmax):
 
     # plot
     if args.plot_PIV:
-        print("Plotting frame ", frame)
 
-        fig, ax = plt.subplots(1,1, figsize=(10,10))
-        ax.imshow(stack[frame-1].T, origin="lower", cmap="gray", vmin=0, vmax=20)
-        ax.quiver(y_tmp*dx + x0, x_tmp*dx + x0, v, u, scale=40/pix_to_um[-1], color="b")
+        # plot
+        fig, ax = plt.subplots(1,1, figsize=(10,8))
+        sns.heatmap(stack[frame].T, ax=ax, square=True, cmap="gray", vmin=0, vmax=14, 
+                    xticklabels=False, yticklabels=False, cbar=True, cbar_kws={'label': 'h [µm]'})
         
+        ax.invert_yaxis()
+        ax.quiver((y_tmp*dx + x0), (x_tmp*dx + x0), v, u, scale=75/pix_to_um[-1], color="c")
+        #ax.quiver((y_tmp*dx + x0)[0::20], (x_tmp*dx + x0)[0::20], v[0::20], u[0::20], scale=75/pix_to_um[-1], color="c")
+
+
+        # add scalebar
+        sb = ScaleBar(pix_to_um[-1], 'um', box_alpha=0, color="w", height_fraction=2e-2, scale_loc="none", fixed_value=100)
+        sb.location = 'lower left'
+        ax.add_artist(sb)
+
+
+        # save
         fig.tight_layout()
-        fig.savefig(f"{args.in_path}/PIV/velocity_fields/frame_{frame}.png");
+        fig.savefig(f"{args.in_path}/PIV_velocity_fields/frame_{frame}.png", dpi=300);
         plt.close()
 
 

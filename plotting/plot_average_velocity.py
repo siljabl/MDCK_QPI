@@ -1,6 +1,6 @@
 import os
 import sys
-module_path = os.path.abspath(os.path.join('..'))
+module_path = os.path.abspath(os.path.join(''))
 if module_path not in sys.path:
 
     sys.path.append(module_path)
@@ -27,7 +27,7 @@ config = json.load(open(f"{args.in_path}/config.txt"))
 
 fmin = config["fmin"]
 fmax = config["fmax"]
-file = args.in_path.split("/")[-1]
+file = args.in_path.split("/")[-2]
 dir  = args.in_path.split(file)[0]
 
 
@@ -39,6 +39,8 @@ except:
 # unit conversion
 pix_to_um = get_pixel_size()
 frame_to_hour = 1 / args.frames_per_hour
+
+print(20 * frame_to_hour / pix_to_um[0])
 
 
 # read data
@@ -59,10 +61,10 @@ vy = data['y_displacement'] * pix_to_um[1] / frame_to_hour
 mean_xvelocity = np.ma.mean(vx, axis=1)
 mean_yvelocity = np.ma.mean(vy, axis=1)
 
-fig, ax = plt.subplots(2,2, figsize=(7,7))
-ax[0,0].hlines(0, density.min(), density.max(), ls="dashed", color="gray")
-ax[0,0].plot(density[:-1], mean_xvelocity, '.', label=r"$\dot{x}$")
-ax[0,0].plot(density[:-1], mean_yvelocity, '.', label=r"$\dot{y}$")
+fig, ax = plt.subplots(1,2, figsize=(5,3))
+ax[0].hlines(0, density.min(), density.max(), ls="dashed", color="gray")
+ax[0].plot(density[:-1], mean_xvelocity, '.', label=r"$\dot{x}$")
+ax[0].plot(density[:-1], mean_yvelocity, '.', label=r"$\dot{y}$")
 
 # plot velocity distribution at various
 # for i in range(len(h_binned)):

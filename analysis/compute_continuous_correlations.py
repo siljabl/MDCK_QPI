@@ -11,6 +11,8 @@ import sys
 import json
 import pickle
 import argparse
+import subprocess
+
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -147,7 +149,6 @@ for frame in tqdm(range(fmax)):
         
         ax.invert_yaxis()
         ax.quiver((y_tmp*dx + x0), (x_tmp*dx + x0), v, u, scale=75/pix_to_um[-1], color="c")
-        #ax.quiver((y_tmp*dx + x0)[0::20], (x_tmp*dx + x0)[0::20], v[0::20], u[0::20], scale=75/pix_to_um[-1], color="c")
 
 
         # add scalebar
@@ -160,6 +161,28 @@ for frame in tqdm(range(fmax)):
         fig.tight_layout()
         fig.savefig(f"{args.in_path}/PIV_velocity_fields/frame_{frame:03d}.png", dpi=300);
         plt.close()
+
+        # Make video
+        out_video = '../videos/PIV_velocities.mp4'
+
+        # Change to the image directory
+        os.chdir(f"{args.path}/PIV_velocity_fields")
+
+        # Define the FFmpeg command to convert images to video
+        ffmpeg_command = ['ffmpeg',
+                        '-framerate', '10',           # Set frame rate
+                        '-i', 'frame_%03d.png',       # Input format
+                        '-c:v', 'libx264',            # Video codec
+                        '-pix_fmt', 'yuv420p',        # Pixel format
+                        out_video                  # Output video file name
+                        ]
+
+        # Run the FFmpeg command
+        try:
+            subprocess.run(ffmpeg_command, check=True)
+            print(f'Video saved as {ffmpeg_command}')
+        except subprocess.CalledProcessError as e:
+            print(f'Error generating video: {e}')
 
 
 

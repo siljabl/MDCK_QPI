@@ -119,17 +119,16 @@ for frame in tqdm(np.unique(df.frame)):
     fig_h.tight_layout()
     fig_V.tight_layout()
 
-    fig_h.savefig(f"{args.path}/cell_height_and_volume/height_frame_{frame+1:03d}.png", dpi=300);
-    fig_V.savefig(f"{args.path}/cell_height_and_volume/volume_frame_{frame+1:03d}.png", dpi=300);
+    fig_h.savefig(f"{args.path}/cell_height_and_volume/height_frame_{frame:03d}.png", dpi=300);
+    fig_V.savefig(f"{args.path}/cell_height_and_volume/volume_frame_{frame:03d}.png", dpi=300);
 
     plt.close(fig_h)
     plt.close(fig_V)
 
 
 # Make video
-
-height_video = 'average_cell_height.mp4'
-volume_video = 'average_cell_volume.mp4'
+height_video = '../videos/average_cell_height.mp4'
+volume_video = '../videos/average_cell_volume.mp4'
 
 # Change to the image directory
 os.chdir(f"{args.path}/cell_height_and_volume")

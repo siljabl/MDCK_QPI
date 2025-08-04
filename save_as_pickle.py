@@ -2,6 +2,8 @@ import os
 import json
 import pickle
 import argparse
+import subprocess
+
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -113,6 +115,28 @@ for f in tqdm(range(len(x_displacement))):
 
     # save
     fig.tight_layout()
-    fig.savefig(f"{args.path}/instant_velocities/frame_{f+1:03d}.png", dpi=300);
+    fig.savefig(f"{args.path}/instant_velocities/frame_{f:03d}.png", dpi=300);
     plt.close()
+
+    # Make video
+    out_video = '../videos/instant_velocities.mp4'
+
+    # Change to the image directory
+    os.chdir(f"{args.path}/instant_velocities")
+
+    # Define the FFmpeg command to convert images to video
+    ffmpeg_command = ['ffmpeg',
+                      '-framerate', '10',           # Set frame rate
+                      '-i', 'frame_%03d.png',       # Input format
+                      '-c:v', 'libx264',            # Video codec
+                      '-pix_fmt', 'yuv420p',        # Pixel format
+                      out_video                  # Output video file name
+                      ]
+
+    # Run the FFmpeg command
+    try:
+        subprocess.run(ffmpeg_command, check=True)
+        print(f'Video saved as {ffmpeg_command}')
+    except subprocess.CalledProcessError as e:
+        print(f'Error generating video: {e}')
 

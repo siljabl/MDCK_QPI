@@ -429,6 +429,7 @@ def vector_spatial_correlation_loopv2(xf, yf, vec1f, vec2f, r_bin_edges):
     Cvf_mask = np.ones(Nbins, dtype=np.bool_)
     vf_rms   = np.sqrt(np.mean(var1xf*var2xf + var1yf*var2yf))
     
+    
     for i in prange(Nbins):
     
         for j in range(len(var1xf)):
@@ -532,13 +533,16 @@ def general_spatial_correlation(x, y, var1, var2=None, dr=40, r_max=500):
     if len(dim_var1) == 2:
 
         if len(dim_var2) == 2:
+            print("scalar spatial correlation")
 
             C_norm, N_in_rbin, r_bin_centers, frame_axis_masked = scalar_spatial_correlation(x, y, var1, var2, dr, r_max)
 
         else:
+            print("scalar-vector spatial correlation")
 
             var2x = var2[0]
             var2y = var2[1]
+
             C_norm, N_in_rbin, r_bin_centers, frame_axis_masked = scalar_vector_spatial_correlation(x, y, var1, [var2x, var2y], dr, r_max)
 
 
@@ -548,13 +552,16 @@ def general_spatial_correlation(x, y, var1, var2=None, dr=40, r_max=500):
         var1y = var1[1]
 
         if len(dim_var2) == 2:
+            print("scalar-vector spatial correlation")
 
             C_norm, N_in_rbin, r_bin_centers, frame_axis_masked = scalar_vector_spatial_correlation(x, y, var2, [var1x, var1y], dr, r_max)
 
         else:
+            print("vector spatial correlation")
 
             var2x = var2[0]
             var2y = var2[1]
+
             C_norm, N_in_rbin, r_bin_centers, frame_axis_masked = vector_spatial_correlation(x, y, [var1x, var1y], [var2x, var2y], dr, r_max)
                   
 

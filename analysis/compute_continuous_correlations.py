@@ -32,8 +32,7 @@ from src.MaskedArrayCorrelations import general_temporal_correlation
 
 # parse input
 parser = argparse.ArgumentParser(description='Compute correlations of data from cell tracks')
-parser.add_argument('in_path',          type=str,   help="path to dataset")
-parser.add_argument('-out_path',        type=str,   help="path to output. Using in_path if set to None",               default=None)
+parser.add_argument('path',             type=str,   help="path to dataset")
 parser.add_argument('-dr',              type=int,   help="size of radial bin for spatial correlation [pix]",           default=40)
 parser.add_argument('-r_max',           type=int,   help="max radial distance for spatial correlation [pix]",          default=500)
 parser.add_argument('-t_max',           type=float, help="max fraction of timeinterval used in temporal correlation",  default=0.5)
@@ -42,28 +41,24 @@ parser.add_argument('-fmax',            type=int,   default=None)
 parser.add_argument('-plot_PIV',        type=bool,  help="plot and save PIV velocity field", default=False)
 args = parser.parse_args()
 
-# if not given, use input folder for outpur also
-if args.out_path == None:
-    args.out_path = args.in_path
-
 
 # Folder for plotting velocity fields
 try:
-    os.mkdir(f"{args.in_path}/PIV_velocity_fields")
+    os.mkdir(f"{args.path}/PIV_velocity_fields")
 except:
     None
 
 
 # folder and path settings
-config = json.load(open(f"{args.in_path}/config.txt"))
+config = json.load(open(f"{args.path}/config.txt"))
 
 fmin = config["fmin"]
 fmax = config["fmax"]-1 #-1 because PIV missing last frame
 if args.fmax != None:
     fmax = args.fmax
 
-file = args.in_path.split("/")[-2]
-dir  = args.in_path.split(file)[0]
+file = args.path.split("/")[-2]
+dir  = args.path.split(file)[0]
 
 
 
@@ -77,7 +72,7 @@ frame_to_hour = 1 / args.frames_per_hour
 
 
 # import cell density
-with open(f"{args.in_path}/masked_arrays.pkl", 'rb') as handle:
+with open(f"{args.path}/masked_arrays.pkl", 'rb') as handle:
     data_tmp = pickle.load(handle)
 
 density = data_tmp['cell_density']
@@ -86,7 +81,7 @@ density = data_tmp['cell_density']
 stack = import_holomonitor_stack(dir, file, fmin, fmax)
 
 # import PIV velocity field
-data_PIV = np.loadtxt(f"{args.in_path}/PIV/velocities/PIVlab_0001.txt", delimiter=",", skiprows=3)
+data_PIV = np.loadtxt(f"{args.path}/PIV/velocities/PIVlab_0001.txt", delimiter=",", skiprows=3)
 x = np.array(data_PIV[:, 0], dtype=int)
 y = np.array(data_PIV[:, 1], dtype=int)
 
@@ -116,7 +111,7 @@ im_height = np.copy(stack)
 for frame in tqdm(range(fmax)):
 
     # Load data
-    data_PIV = np.loadtxt(f"{args.in_path}/PIV/velocities/PIVlab_{frame+1:04d}.txt", delimiter=",", skiprows=3)
+    data_PIV = np.loadtxt(f"{args.path}/PIV/velocities/PIVlab_{frame+1:04d}.txt", delimiter=",", skiprows=3)
 
     # Extract values
     u = np.array(data_PIV[:, 2], dtype=np.float64)
@@ -142,7 +137,6 @@ for frame in tqdm(range(fmax)):
     # plot
     if args.plot_PIV:
 
-        # plot
         fig, ax = plt.subplots(1,1, figsize=(10,8))
         sns.heatmap(stack[frame].T, ax=ax, square=True, cmap="gray", vmin=0, vmax=14, 
                     xticklabels=False, yticklabels=False, cbar=True, cbar_kws={'label': 'h [µm]'})
@@ -159,7 +153,7 @@ for frame in tqdm(range(fmax)):
 
         # save
         fig.tight_layout()
-        fig.savefig(f"{args.in_path}/PIV_velocity_fields/frame_{frame:03d}.png", dpi=300);
+        fig.savefig(f"{args.path}/PIV_velocity_fields/frame_{frame:03d}.png", dpi=300);
         plt.close()
 
         # Make video
@@ -265,5 +259,5 @@ out_dict = {'C_t_vv': C_t_vv['C_norm'],
             'density':  density[:args.fmax]}
 
 # save as pickle
-with open(f"{args.out_path}/continuous_correlations.pkl", 'wb') as handle:
+with open(f"{args.path}/continuous_correlations.pkl", 'wb') as handle:
     pickle.dump(out_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)

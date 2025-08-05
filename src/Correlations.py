@@ -125,17 +125,19 @@ def spatial_autocorrelation(im):
 
 
 def radial_distribution(im, vox_to_um, binsize):
-    
-    # raduis matrix
-    Lx = int(len(im)/2)
-    if Lx%2==0:
-        im = im[:-1]
-        Lx = int(len(im)/2)
 
-    Ly = int(len(im[0])/2)
-    if Ly%2==0:
+    # reshape to odd number
+    _shape = np.shape(im)
+    
+    if _shape[0]%2 == 0:
+        im = im[:-1]
+
+    if _shape[1]%2 == 0:
         im = im[:,:-1]
-        Ly = int(len(im[0])/2)
+    
+    # define raduis matrix
+    Lx = int(len(im)/2)
+    Ly = int(len(im[0])/2)
 
     x = np.arange(-Lx,Lx+1,1) * vox_to_um[-2]
     y = np.arange(-Ly,Ly+1,1) * vox_to_um[-1]
@@ -149,9 +151,10 @@ def radial_distribution(im, vox_to_um, binsize):
 
     for i in range(nbins):
         mask = (r >= i*binsize) * (r < (i+1)*binsize)
-        dist[i] = np.mean(r[mask])
-        mean[i] = np.mean(im[mask])
-        std[i]  = np.std(im[mask])
+        if np.sum(mask) > 0:
+            dist[i] = np.mean(r[mask])
+            mean[i] = np.mean(im[mask])
+            std[i]  = np.std(im[mask])
 
     return dist, mean, std
 
@@ -198,8 +201,7 @@ def general_spatial_autocorrelation(im1, im2=None, vox_to_um=1, r_max=500, binsi
     dim_var1 = np.shape(im1)
     dim_var2 = np.shape(im2)
 
-    print(len(dim_var1), len(dim_var2))
-
+    # print(len(dim_var1), len(dim_var2))
     # len=3: variable is scalar (t,x,y), len=4: variable is vector (dim, t, x, y)
     assert len(dim_var1) in [3,4] and len(dim_var2) in [3,4]
 

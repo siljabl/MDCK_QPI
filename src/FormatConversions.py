@@ -72,3 +72,31 @@ def import_tomocube_stack(dir, dataset, h_scaling, f_min=0, f_max=40, n_cell=1.3
     n_stack = n_stack * n_cell / n_mean
 
     return n_stack, h_stack
+
+
+def import_txt_with_NaN(input_file, header_rows=3):
+    with open(input_file, 'r') as file:
+
+        # Skip the first three lines
+        for _ in range(header_rows):
+            next(file)
+        
+        # Read the remaining lines and replace 'NaN'
+        output_file = []
+
+        # Process the remaining rows
+        for line in file:
+            # Split the line into values (assuming a whitespace delimiter)
+            values = line.strip().split(",")
+
+            # Replace "NaN" with the specified replacement value and convert to float
+            processed_row = [
+                float(value) if value != "NaN" else 9999.0
+                for value in values
+            ]
+            output_file.append(processed_row)
+    
+    output_file = np.array(output_file)
+    output_file = np.ma.array(output_file, mask=output_file==9999.0)
+
+    return output_file

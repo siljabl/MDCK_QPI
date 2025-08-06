@@ -69,7 +69,7 @@ def scalar_vector_temporal_correlation(var1, vec2, Nframes, t_max=None):
             Noki = len(var2x[i,:].compressed())
             
             if Noki>0:
-                bool_oki = ~var2x.mask[i,:]
+                bool_oki = ~var2x.mask[i,:] * var2y.mask[i,:]
             
                 for j in range(i, Nframes):
 
@@ -79,7 +79,7 @@ def scalar_vector_temporal_correlation(var1, vec2, Nframes, t_max=None):
                         
                         #If at least one acceptable PIV vector
                         if Nokj>0:        
-                            bool_okj = ~var2x.mask[j,:]   
+                            bool_okj = ~var2x.mask[j,:] * var2y.mask[j,:]
                             bool_ok  = bool_oki * bool_okj
                             
                             var1_i = var1[i,bool_ok].compressed()
@@ -122,7 +122,7 @@ def vector_temporal_correlation(vec1, vec2, Nframes, t_max=None):
             Noki = len(var1x[i,:].compressed())
             
             if Noki>0:
-                bool_oki = ~var1x.mask[i,:]
+                bool_oki = ~var1x.mask[i,:] * var1y.mask[i,:]
             
                 for j in range(i, Nframes):
 
@@ -132,7 +132,7 @@ def vector_temporal_correlation(vec1, vec2, Nframes, t_max=None):
                         
                         #If at least one acceptable PIV vector
                         if Nokj>0:  
-                            bool_okj = ~var1x.mask[j,:]   
+                            bool_okj = ~var1x.mask[j,:] * var1y.mask[j,:]   
                             bool_ok  = bool_oki * bool_okj
                             
                             var1x_i = var1x[i,bool_ok].compressed()
@@ -148,7 +148,7 @@ def vector_temporal_correlation(vec1, vec2, Nframes, t_max=None):
                             var2y_j = var2y[j,bool_ok].compressed()
                                                             
                             #Normalize by the rms
-                            C_norm[i,j-i] = np.ma.mean(var1x_i * var2x_j + var1y_i * var2y_j) /  np.ma.sqrt(abs( np.ma.mean(var1x_i*var2x_i + var1y_i*var2y_i ) * np.ma.mean(var1x_j*var2x_j + var1y_j*var2y_j ) ))
+                            C_norm[i,j-i] = np.ma.mean(var1x_i * var2x_j + var1y_i * var2y_j) / np.ma.sqrt(abs( np.ma.mean(var1x_i*var2x_i + var1y_i*var2y_i ) * np.ma.mean(var1x_j*var2x_j + var1y_j*var2y_j ) ))
                             N[i,j] = np.min([Noki, Nokj])                       
                             delta_f[i,j] = j-i
 

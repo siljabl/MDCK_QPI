@@ -156,6 +156,16 @@ def radial_distribution(im, vox_to_um, binsize):
             mean[i] = np.mean(im[mask])
             std[i]  = np.std(im[mask])
 
+        else:
+            dist[i] = np.nan
+            mean[i] = np.nan
+            std[i]  = np.nan
+
+    dist = np.ma.array(dist, mask = dist==np.nan)
+    mean = np.ma.array(mean, mask = mean==np.nan)
+    std  = np.ma.array(std,  mask =  std==np.nan)
+        
+
     return dist, mean, std
 
 
@@ -221,7 +231,15 @@ def general_spatial_autocorrelation(im1, im2=None, vox_to_um=1, r_max=500, binsi
 
     C_norm = []
 
+
     for frame in tqdm(range(Nframes)):
+
+        # replace masked entries with mean
+        im1x.data[im1x.mask] = np.ma.mean(im1x)
+        im2x.data[im2x.mask] = np.ma.mean(im2x)
+        im1y.data[im1y.mask] = np.ma.mean(im1y)
+        im2y.data[im2y.mask] = np.ma.mean(im2y)
+
 
         # compute FFT of image
         fft_im1x = np.fft.fft2(im1x[frame], norm="ortho")

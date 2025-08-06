@@ -25,7 +25,7 @@ if module_path not in sys.path:
     sys.path.append(module_path)
 
 from src.PlottingUtils import bin_by_density
-from src.FormatConversions import import_holomonitor_stack
+from src.FormatConversions import import_holomonitor_stack, import_txt_with_NaN
 from src.HolomonitorFunctions    import get_pixel_size
 from src.Correlations            import general_spatial_autocorrelation
 from src.MaskedArrayCorrelations import general_temporal_correlation
@@ -81,9 +81,10 @@ density = data_tmp['cell_density']
 stack = import_holomonitor_stack(dir, file, fmin, fmax)
 
 # import PIV velocity field
-data_PIV = np.loadtxt(f"{args.path}/PIV/velocities/PIVlab_0001.txt", delimiter=",", skiprows=3)
-x = np.array(data_PIV[:, 0], dtype=int)
-y = np.array(data_PIV[:, 1], dtype=int)
+# data_PIV = np.loadtxt(f"{args.path}/PIV/velocities/PIVlab_0001.txt", delimiter=",", skiprows=3)
+data_PIV = import_txt_with_NaN(f"{args.path}/PIV/velocities/PIVlab_0001.txt", header_rows=3)
+x = np.ma.array(data_PIV[:, 0], dtype=int)
+y = np.ma.array(data_PIV[:, 1], dtype=int)
 
 
 
@@ -94,45 +95,45 @@ y = np.array(data_PIV[:, 1], dtype=int)
 # transform PIV position to matrix entries
 dx   = y[1] - y[0]
 x0   = y[0] - dx
-xmax = int((np.max(y) - x0) / dx) + 1
+xmax = int((np.ma.max(y) - x0) / dx) + 1
 
-x_tmp = np.array((x - x0) / dx, dtype=int)
-y_tmp = np.array((y - x0) / dx, dtype=int)
+x_tmp = np.ma.array((x - x0) / dx, dtype=int)
+y_tmp = np.ma.array((y - x0) / dx, dtype=int)
 
-PIV_position_x = np.zeros((fmax, xmax, xmax), dtype=np.float64)
-PIV_position_y = np.zeros((fmax, xmax, xmax), dtype=np.float64)
-PIV_velocity_x = np.zeros((fmax, xmax, xmax), dtype=np.float64)
-PIV_velocity_y = np.zeros((fmax, xmax, xmax), dtype=np.float64)
-PIV_height     = np.zeros((fmax, xmax, xmax), dtype=np.float64) # not PIV, but same size as PIV
+PIV_position_x = np.ma.zeros((fmax, xmax, xmax), dtype=np.float64)
+PIV_position_y = np.ma.zeros((fmax, xmax, xmax), dtype=np.float64)
+PIV_velocity_x = np.ma.zeros((fmax, xmax, xmax), dtype=np.float64)
+PIV_velocity_y = np.ma.zeros((fmax, xmax, xmax), dtype=np.float64)
+PIV_height     = np.ma.zeros((fmax, xmax, xmax), dtype=np.float64) # not PIV, but same size as PIV
 
-im_height = np.copy(stack)
+im_height = np.ma.copy(stack)
 
 # Fill arrays
 for frame in tqdm(range(fmax)):
 
     # Load data
-    data_PIV = np.loadtxt(f"{args.path}/PIV/velocities/PIVlab_{frame+1:04d}.txt", delimiter=",", skiprows=3)
+    data_PIV = import_txt_with_NaN(f"{args.path}/PIV/velocities/PIVlab_{frame+1:04d}.txt", header_rows=3)
+    #data_PIV = np.loadtxt(f"{args.path}/PIV/velocities/PIVlab_{frame+1:04d}.txt", delimiter=",", skiprows=3)
 
     # Extract values
-    u = np.array(data_PIV[:, 2], dtype=np.float64)
-    v = np.array(data_PIV[:, 3], dtype=np.float64)
+    u = np.ma.array(data_PIV[:, 2], dtype=np.float64)
+    v = np.ma.array(data_PIV[:, 3], dtype=np.float64)
 
     # masking didn't work properly, so probably mean is affected by outside data points
     PIV_position_x[frame-1, x_tmp, y_tmp] = x
     PIV_position_y[frame-1, x_tmp, y_tmp] = y
-    PIV_velocity_x[frame-1, x_tmp, y_tmp] = u - np.mean(u)
-    PIV_velocity_y[frame-1, x_tmp, y_tmp] = v - np.mean(v)
+    PIV_velocity_x[frame-1, x_tmp, y_tmp] = u - np.ma.mean(u)
+    PIV_velocity_y[frame-1, x_tmp, y_tmp] = v - np.ma.mean(v)
 
-    frame_mean_height = np.mean(stack[frame][stack[frame] > 0])
+    frame_mean_height = np.ma.mean(stack[frame][stack[frame] > 0])
 
-    # Probably better to take mean
+    # Probably better to coarse grain im (instead of just taking stack[x,y])
     PIV_height[frame, x_tmp, y_tmp]           = stack[frame, x, y]
     PIV_height[frame][PIV_height[frame] > 0] -= frame_mean_height
     
     # subtrack mean
     im_height[frame]                        = stack[frame]
     im_height[frame][im_height[frame] > 0] -= frame_mean_height
-
 
     # plot
     if args.plot_PIV:
@@ -236,9 +237,11 @@ t_max = int(args.t_max * len(density))
 PIV_velocity = [PIV_velocity_x, PIV_velocity_y]
 
 # compute correlation and bin
+
+print(np.shape(PIV_velocity))
 C_t_vv = general_temporal_correlation(PIV_velocity, PIV_velocity, t_max=t_max)
-C_t_hh = general_temporal_correlation(height,       height,       t_max=t_max)
-C_t_hv = general_temporal_correlation(PIV_height,   PIV_velocity, t_max=t_max)
+#C_t_hh = general_temporal_correlation(height,       height,       t_max=t_max)
+#C_t_hv = general_temporal_correlation(PIV_height,   PIV_velocity, t_max=t_max)
 
 t_arr = np.arange(t_max) * frame_to_hour
 r_arr  = C_r_vv['r_bin']
@@ -250,9 +253,9 @@ r_arr  = C_r_vv['r_bin']
 ##################
 out_dict = {'C_t_vv': C_t_vv['C_norm'],
             'C_r_vv': C_r_vv['C_norm'],
-            'C_t_hh': C_t_hh['C_norm'],
+            #'C_t_hh': C_t_hh['C_norm'],
             'C_r_hh': C_r_hh['C_norm'],
-            'C_t_hv': C_t_hv['C_norm'],
+            #'C_t_hv': C_t_hv['C_norm'],
             'C_r_hv': C_r_hv['C_norm'],
             't_vv':   t_arr,
             'r_vv':   r_arr, 

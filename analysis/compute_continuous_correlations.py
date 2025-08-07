@@ -53,7 +53,7 @@ except:
 config = json.load(open(f"{args.path}/config.txt"))
 
 fmin = config["fmin"]
-fmax = config["fmax"]-1 #-1 because PIV missing last frame
+fmax = config["fmax"]-1
 if args.fmax != None:
     fmax = args.fmax
 
@@ -108,6 +108,7 @@ PIV_height     = np.ma.zeros((fmax, xmax, xmax), dtype=np.float64) # not PIV, bu
 
 im_height = np.ma.copy(stack)
 
+
 # Fill arrays
 for frame in tqdm(range(fmax)):
 
@@ -128,7 +129,9 @@ for frame in tqdm(range(fmax)):
     frame_mean_height = np.ma.mean(stack[frame][stack[frame] > 0])
 
     # Probably better to coarse grain im (instead of just taking stack[x,y])
-    PIV_height[frame, x_tmp, y_tmp]           = stack[frame, x, y]
+    for i in range(len(x_tmp)):
+        PIV_height[frame, x_tmp[i], y_tmp[i]] = np.mean(stack[frame, x[i]-int(dx/2):x[i]+int(dx/2), y[i]-int(dx/2):y[i]+int(dx/2)])
+    #PIV_height[frame, x_tmp, y_tmp]           = stack[frame, x, y]
     PIV_height[frame][PIV_height[frame] > 0] -= frame_mean_height
     
     # subtrack mean
@@ -237,11 +240,9 @@ t_max = int(args.t_max * len(density))
 PIV_velocity = [PIV_velocity_x, PIV_velocity_y]
 
 # compute correlation and bin
-
-print(np.shape(PIV_velocity))
 C_t_vv = general_temporal_correlation(PIV_velocity, PIV_velocity, t_max=t_max)
-#C_t_hh = general_temporal_correlation(height,       height,       t_max=t_max)
-#C_t_hv = general_temporal_correlation(PIV_height,   PIV_velocity, t_max=t_max)
+C_t_hh = general_temporal_correlation(height,       height,       t_max=t_max)
+C_t_hv = general_temporal_correlation(PIV_height,   PIV_velocity, t_max=t_max)
 
 t_arr = np.arange(t_max) * frame_to_hour
 r_arr  = C_r_vv['r_bin']
@@ -253,9 +254,9 @@ r_arr  = C_r_vv['r_bin']
 ##################
 out_dict = {'C_t_vv': C_t_vv['C_norm'],
             'C_r_vv': C_r_vv['C_norm'],
-            #'C_t_hh': C_t_hh['C_norm'],
+            'C_t_hh': C_t_hh['C_norm'],
             'C_r_hh': C_r_hh['C_norm'],
-            #'C_t_hv': C_t_hv['C_norm'],
+            'C_t_hv': C_t_hv['C_norm'],
             'C_r_hv': C_r_hv['C_norm'],
             't_vv':   t_arr,
             'r_vv':   r_arr, 

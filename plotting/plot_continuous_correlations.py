@@ -72,7 +72,7 @@ f_max = len(data['C_r_vv'])
 C_r_binned, density_bins = bin_by_density(data['C_r_vv'], density, bin_size=args.bin_size)
 C_t_binned, _            = bin_by_density(data['C_t_vv'], density, bin_size=args.bin_size)
 C_t_binned = np.ma.array(C_t_binned, mask=C_t_binned==0)
-print(data['C_t_vv'])
+
 
 # define colormap
 Nbins  = len(density_bins) - 1
@@ -108,8 +108,8 @@ fig.savefig(f"{args.in_path}/figs/autocorrelations_PIV.png", dpi=300, bbox_inche
 
 # bin correlations by density
 C_r_binned, density_bins = bin_by_density(data['C_r_hh'], density, bin_size=args.bin_size)
-#C_t_binned, _            = bin_by_density(data['C_t_hh'], density, bin_size=args.bin_size)
-#C_t_binned = np.ma.array(C_t_binned, mask=C_t_binned==0)
+C_t_binned, _            = bin_by_density(data['C_t_hh'], density, bin_size=args.bin_size)
+C_t_binned = np.ma.array(C_t_binned, mask=C_t_binned==0)
 
 r_hh = np.arange(len(C_r_binned[0])) * np.max(r_arr) / len(C_r_binned[0])
 
@@ -125,7 +125,7 @@ ax[1].hlines(0, 0, r_hh.max(),  linestyles="dashed", color="gray")
 
 # loop over density
 for i in range(Nbins):
-    #ax[0].plot(t_arr, C_t_binned[i], color=colors[i])
+    ax[0].plot(t_arr, C_t_binned[i], color=colors[i])
     ax[1].plot(r_hh,  C_r_binned[i], color=colors[i])
 
 
@@ -142,9 +142,9 @@ fig.savefig(f"{args.in_path}/figs/autocorrelations_height_continous.png", dpi=30
 
 # bin correlations by density
 C_r_binned, density_bins = bin_by_density(data['C_r_hv'], density, bin_size=args.bin_size)
-#C_t_binned, _            = bin_by_density(data['C_t_hv'], density, bin_size=args.bin_size)#
-#C_t_binned = np.ma.array(C_t_binned, mask=C_t_binned==0)
-
+C_t_binned, _            = bin_by_density(data['C_t_hv'], density, bin_size=args.bin_size)#
+C_t_binned = np.ma.array(C_t_binned, mask=C_t_binned==0)
+print(data['C_t_hv'])
 
 # define colormap
 Nbins  = len(density_bins) - 1
@@ -163,7 +163,7 @@ ax[1].hlines(0, 0, r_arr.max(), linestyles="dashed", color="gray")
 
 # loop over density
 for i in range(Nbins):
-    #ax[0].plot(t_arr, C_t_binned[i], color=colors[i])
+    ax[0].plot(t_arr, C_t_binned[i], color=colors[i])
     ax[1].plot(r_arr, C_r_binned[i], color=colors[i])
 
 

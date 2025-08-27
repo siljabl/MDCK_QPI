@@ -5,7 +5,7 @@ N.B. the code relies on a trained machine learning model that is not in this rep
 
 ## Source code
 - 'MlModels.py': defines machine learning class(?) that classifies voxels as cells. Taken from [HTH-TomocubeAnalysis](https://github.uio.no/Hybrid-Technology-Hub/HTH-TomocubeAnalysis).
-- 'FormatConvensions.py' and 'ImUtils.py': used to imoprt images. Taken from [HTH-TomocubeAnalysis](https://github.uio.no/Hybrid-Technology-Hub/HTH-TomocubeAnalysis).
+- 'FormatConvensions.py' and 'ImUtils.py': used to import images. Taken from [HTH-TomocubeAnalysis](https://github.uio.no/Hybrid-Technology-Hub/HTH-TomocubeAnalysis).
 - 'Segmentation3D.py': contains all functions needed to compute 2D heights and refractive index from 3D stacks.
 - 'PlottingFunctions.py': contains functions that return figures that illustrate operations.
 - 'HolomonitorFunctions.py': contains all functions that are specific for Holomonitor data.

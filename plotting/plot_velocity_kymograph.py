@@ -35,7 +35,8 @@ parser.add_argument('-r_max',           type=int,   help="max radial distance fo
 parser.add_argument('-t_max',           type=float, help="max fraction of timeinterval used in temporal correlation",  default=0.5)
 parser.add_argument('-frames_per_hour', type=int,   help="number of frames in an hour",                                default=12)
 parser.add_argument('-fmax',            type=int,   default=None)
-parser.add_argument('-plot_PIV',        type=bool,  help="plot and save PIV velocity field", default=False)
+parser.add_argument('-plot_PIV',        type=bool,  help="plot and save PIV velocity field",  default=False)
+parser.add_argument('-vlim',            type=float, help="plot and save PIV velocity field", default=None)
 args = parser.parse_args()
 
 # if not given, use input folder for output also
@@ -118,7 +119,13 @@ for frame in range(fmax):
 
 
 # center position
-idx_c = int(xmax / 2)
+idx_c  = int(xmax / 2)
+if args.vlim == None:
+    vlim_x = np.max(abs(PIV_velocity_x))
+    vlim_y = np.max(abs(PIV_velocity_y))
+    vlim   = np.max([vlim_x, vlim_y])
+else:
+    vlim = args.vlim
 
 fig, ax = plt.subplots(2,3, figsize=(7.5,5.5), sharex=True, sharey='col')
 
@@ -135,11 +142,11 @@ for i in range(2):
 ax[0,0].hlines(idx_c*dx, 0, xmax*dx, linestyle="dashed", color="c")
 ax[1,0].vlines(idx_c*dx, 0, xmax*dx, linestyle="dashed", color="c")
 
-im01 = ax[0,1].imshow(PIV_velocity_x[:,idx_c], aspect="auto", extent=[0, dims[1], 0, fmax*frame_to_hour], cmap=cm.vik)
-im02 = ax[0,2].imshow(PIV_velocity_y[:,idx_c], aspect="auto", extent=[0, dims[1], 0, fmax*frame_to_hour], cmap=cm.vik)
+im01 = ax[0,1].imshow(PIV_velocity_x[:,idx_c], aspect="auto", extent=[0, dims[1], 0, fmax*frame_to_hour], cmap=cm.vik, vmin=-vlim, vmax=vlim)
+im02 = ax[0,2].imshow(PIV_velocity_y[:,idx_c], aspect="auto", extent=[0, dims[1], 0, fmax*frame_to_hour], cmap=cm.vik, vmin=-vlim, vmax=vlim)
 
-im11 = ax[1,1].imshow(PIV_velocity_x[:,:,idx_c], aspect="auto", extent=[0, dims[1], 0, fmax*frame_to_hour], cmap=cm.vik)
-im12 = ax[1,2].imshow(PIV_velocity_y[:,:,idx_c], aspect="auto", extent=[0, dims[1], 0, fmax*frame_to_hour], cmap=cm.vik)
+im11 = ax[1,1].imshow(PIV_velocity_x[:,:,idx_c], aspect="auto", extent=[0, dims[1], 0, fmax*frame_to_hour], cmap=cm.vik, vmin=-vlim, vmax=vlim)
+im12 = ax[1,2].imshow(PIV_velocity_y[:,:,idx_c], aspect="auto", extent=[0, dims[1], 0, fmax*frame_to_hour], cmap=cm.vik, vmin=-vlim, vmax=vlim)
 
 plt.colorbar(im01, ax=ax[0,1])
 plt.colorbar(im02, ax=ax[0,2])
